@@ -1,7 +1,7 @@
 import java.sql.*;
 import java.util.Scanner;
 
-public class BankApp {
+public class Atmapp{
     private static final String DB_URL="jdbc:mysql://localhost:3306/BANK";
     private static final String user="root";      
     private static final String password="Kumara.@01";  
