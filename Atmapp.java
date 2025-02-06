@@ -1,13 +1,13 @@
 import java.sql.*;
 import java.util.Scanner;
 
-public class Atmapp{
+public class BankApp {
     private static final String DB_URL="jdbc:mysql://localhost:3306/BANK";
     private static final String user="root";      
     private static final String password="Kumara.@01";  
     private static final double Daily_withdraw_limit=10000.00;
 
-    public static void main(String[] args){
+    public static void main(String[] args) {
         Scanner sc=new Scanner(System.in);
         try (Connection conn=DriverManager.getConnection(DB_URL,user,password)) {
             System.out.println("Welcome to the ATM.");
@@ -26,8 +26,9 @@ public class Atmapp{
                 System.out.println("\n---ATM Menu---");
                 System.out.println("1. Deposit");
                 System.out.println("2. Withdraw");
-                System.out.println("3. Check Balance");
-                System.out.println("4. Exit");
+                System.out.println("3. Set Pin");
+                System.out.println("4. Check Balance");
+                System.out.println("5. Exit");
                 System.out.print("Enter your choice: ");
                 int choice=sc.nextInt();
                 sc.nextLine(); // consume newline
@@ -40,9 +41,11 @@ public class Atmapp{
                         withdraw(conn,sc,accountId);
                         break;
                     case 3:
-                        checkBalance(conn,accountId);
+                    	setPin(conn,sc,accountId);
                         break;
                     case 4:
+                    	checkBalance(conn,accountId);
+                    case 5:
                         running=false;
                         System.out.println("Thank you for using the ATM.");
                         break;
@@ -142,6 +145,31 @@ public class Atmapp{
                 System.out.println("Error processing deposit.");
             }
         }
+    }
+    
+    //Set pin
+    public static void setPin(Connection conn,Scanner sc,int accountId)throws Exception{
+    	System.out.print("Enter new PIN: ");
+    	int newPin=sc.nextInt();
+    	sc.nextLine();
+    	
+    	if(1000>newPin || newPin>9999) {
+    		System.out.println("Invalid PIN. Please enter a 4-digit number.");
+    		return;
+    	}
+    	String sql="UPDATE accounts SET PIN=? WHERE account_id=?";
+    	try(PreparedStatement pstmt=conn.prepareStatement(sql)){
+    		pstmt.setInt(1, newPin);
+    		pstmt.setInt(2,accountId);
+    		int rowsUpdated=pstmt.executeUpdate();
+    		if(rowsUpdated>0) {
+    			System.out.println("Your PIN changed successfully.");
+    		}
+    		else {
+    			System.out.println("Account not found.");
+    		}
+    	}
+    	
     }
 
     // Check Balance
